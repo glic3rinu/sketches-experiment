@@ -2,9 +2,13 @@
 
 ```bash
 pip install requests
+cd
+git clone https://github.com/glic3rinu/sketches-experiment.git
+```
 
+```bash
 # env is the working directory
-cd env
+cd sketches-experiment/env
 export PATH=$PATH:$(pwd)/../src
 getips > ips.txt
 
