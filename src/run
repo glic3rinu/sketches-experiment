@@ -20,6 +20,7 @@ function run () {
             -p "$ORIGIN" root@[$IP]:/dev/shm/$TARGET
         CMD="/dev/shm/$TARGET"
     else
+        shift;
         CMD="$@"
     fi
     echo "Going to run [$IP] $CMD" >&2
@@ -29,8 +30,7 @@ function run () {
         -o ControlMaster=auto \
         -o ControlPersist=yes \
         -o ControlPath=~/.ssh/confine-%r-%h-%p \
-        root@$IP "$CMD"
-    echo "Clossing [$IP]" >&2
+        root@$IP "$CMD" && echo "Success on $IP" || echo "Failure on $IP" >&2
 }
 export -f run
 

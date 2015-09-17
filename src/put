@@ -12,13 +12,16 @@ logs=''
 
 while read IP; do
     log_path="$log_dir/$counter.log"
-    scp -o stricthostkeychecking=no \
-        -o BatchMode=yes \
-        -o EscapeChar=none \
-        -o ControlMaster=auto \
-        -o ControlPersist=yes \
-        -o ControlPath=~/.ssh/confine-%r-%h-%p \
-        $1 root@[$IP]:${2} &> "$log_path" &
+    {
+        echo "Going to copy $1 to root@[$IP]:${2}" >&2
+        scp -o stricthostkeychecking=no \
+            -o BatchMode=yes \
+            -o EscapeChar=none \
+            -o ControlMaster=auto \
+            -o ControlPersist=yes \
+            -o ControlPath=~/.ssh/confine-%r-%h-%p \
+            $1 root@[$IP]:${2} && echo "Success on $IP" || echo "Failure on $IP" >&2
+    } &> "$log_path" &
     counter=$(($counter+1))
     logs="$logs $log_path"
 done < <(cat "$ips_path")
