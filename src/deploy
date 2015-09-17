@@ -1,10 +1,17 @@
 #!/bin/bash
 
-git clone https://github.com/esterl/sketches.git
-cd sketches
+apt-get update
+apt-get install -y locales
+
+sed -i "s/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/" /etc/locale.gen
+locale-gen
+
+apt-get install -y git build-essential
+
+cd sketches || { git clone https://github.com/esterl/sketches.git; cd sketches; } && git pull origin
+
+
 make
 sudo make install
 
-
 g++ timing.cpp -lpcap -lssl -lcrypto -lsketches -I<PATH TO SKETCHES> -o timing -std=c++11
-

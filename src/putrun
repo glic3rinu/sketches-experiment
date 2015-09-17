@@ -1,28 +1,23 @@
 #!/bin/bash
 
-
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/utils.sh
 
-
-log_dir="$DIR/../env/logs/deploy"
-results_dir="$DIR/../env/results/$(date +%Y.%m.%d-%H:%M:%S)"
+log_dir="$DIR/../env/logs/$1"
 ips_path="$DIR/../env/ips.txt"
 mkdir -p "$log_dir"
-mkdir -p "$results_dir"
 logs=''
-
-origin=$1
-default_target=$results_dir/$counter.$origin
-target=${2:-$default_target}
 
 counter=0
 while read IP; do
     log_path="$log_dir/$counter.log"
-    get $IP $@ "$log_path" &
+    {
+        put $IP $@ && run $IP $@
+    } &> "$log_path" &
     counter=$(($counter+1))
     logs="$logs $log_path"
 done < <(cat "$ips_path")
+
 
 echo "  ${bold}$counter operations running on the background."
 echo "  You can safely cancel this at any time ${normal}"

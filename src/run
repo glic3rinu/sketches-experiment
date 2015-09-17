@@ -1,47 +1,17 @@
 #!/bin/bash
 
 
-bold=$(tput bold)
-normal=$(tput sgr0)
-
-
-function run () {
-    # Accepts local script filename or command
-    IP="$1"
-    if [[ $# -eq 2 && -e "$2" ]]; then
-        ORIGIN=$2
-        TARGET=$(ps aux | sha256sum | base64 | head -c 10 ; echo)
-        scp -o stricthostkeychecking=no \
-            -o BatchMode=yes \
-            -o EscapeChar=none \
-            -o ControlMaster=auto \
-            -o ControlPersist=yes \
-            -o ControlPath=~/.ssh/confine-%r-%h-%p \
-            -p "$ORIGIN" root@[$IP]:/dev/shm/$TARGET
-        CMD="/dev/shm/$TARGET"
-    else
-        shift;
-        CMD="$@"
-    fi
-    echo "Going to run [$IP] $CMD" >&2
-    ssh -o stricthostkeychecking=no \
-        -o BatchMode=yes \
-        -o EscapeChar=none \
-        -o ControlMaster=auto \
-        -o ControlPersist=yes \
-        -o ControlPath=~/.ssh/confine-%r-%h-%p \
-        root@$IP "$CMD" && echo "Success on $IP" || echo "Failure on $IP" >&2
-}
-export -f run
-
-
-counter=0
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. $DIR/utils.sh
+
+
 log_dir="$DIR/../env/logs/$1"
 ips_path="$DIR/../env/ips.txt"
 mkdir -p "$log_dir"
 logs=''
 
+
+counter=0
 while read IP; do
     log_path="$log_dir/$counter.log"
     run $IP $@ &> "$log_path" &
@@ -49,9 +19,23 @@ while read IP; do
     logs="$logs $log_path"
 done < <(cat "$ips_path")
 
+
 echo "  ${bold}$counter operations running on the background."
 echo "  You can safely cancel this at any time ${normal}"
 echo 
 echo
 
+while true; do
+    sleep 1
+    current=$(ps -o ppid,pid,comm|grep "ssh\|scp"|wc -l)
+    if [[ $current -eq 0 ]]; then
+        echo "FINISHED"
+        exit 0
+    else
+        echo -e "\e[1ARemmaining: $current "
+    fi
+    last=$current
+done & 
+
 tail -f $logs
+exit 0
