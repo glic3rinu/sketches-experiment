@@ -32,7 +32,7 @@ function put () {
         -o ControlMaster=auto \
         -o ControlPersist=yes \
         -o ControlPath=~/.ssh/confine-%r-%h-%p \
-        $origin root@[$IP]:${target} && echo "Success on $IP" || echo "Failure on $IP" >&2
+        -p $origin root@[$IP]:${target} && echo "Success on $IP" || echo "Failure on $IP" >&2
 }
 export -f put
 
@@ -56,18 +56,20 @@ export -f get
 function taillogs () {
     echo 
     echo
-
-    tail -f $@ &
-    tail_pid=$!
-    
     while true; do
-        sleep 1
-        if [[ $(ps -o ppid,pid,comm|grep "ssh\|scp"|wc -l) -eq 0 ]]; then
-            kill $tail_pid
+        sleep 0.5
+        current=$(ps -o ppid,pid,comm|grep "ssh\|scp"|wc -l)
+        if [[ $current -eq 0 ]]; then
+            echo "FINISHED"
             exit 0
+        elif [[ $last -ne $current ]]; then
+            echo "Remmaining: $current"
+        else
+            echo -e "\e[1ARemmaining: $(ps -o ppid,pid,comm|grep 'ssh\|scp'|wc -l)"
         fi
-    done
-    kill $tail_pid
-    exit 0
+        last=$current
+    done & 
+
+    tail -f $@
 }
 export -f taillogs

@@ -11,8 +11,11 @@ logs=''
 counter=0
 while read IP; do
     log_path="$log_dir/$counter.log"
+    origin=$1
+    #target=${2:-"/tmp/$(ps aux | sha256sum | base64 | head -c 10 ; echo)"}
+    target=${2:-"/tmp/$(basename $origin)"}
     {
-        put $IP $@ && run $IP $@
+        put $IP $origin $target && run $IP $target
     } &> "$log_path" &
     counter=$(($counter+1))
     logs="$logs $log_path"

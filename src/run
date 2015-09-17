@@ -22,20 +22,6 @@ done < <(cat "$ips_path")
 
 echo "  ${bold}$counter operations running on the background."
 echo "  You can safely cancel this at any time ${normal}"
-echo 
-echo
 
-while true; do
-    sleep 1
-    current=$(ps -o ppid,pid,comm|grep "ssh\|scp"|wc -l)
-    if [[ $current -eq 0 ]]; then
-        echo "FINISHED"
-        exit 0
-    else
-        echo -e "\e[1ARemmaining: $current "
-    fi
-    last=$current
-done & 
-
-tail -f $logs
+taillogs $logs
 exit 0
