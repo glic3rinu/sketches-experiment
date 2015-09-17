@@ -1,4 +1,27 @@
 #!/bin/bash
 
-./timing.sh
+cat <<'EOF' > timing.sh
+resultfile=test_timing.cvs
+VCOLUMNS=(8 8 16 16 32 32 64 64)
+VROWS=(8 16 16 32 32 64 64 128)
+pcap=~/test.pcap
+echo "sketchType, hashLength, sketchColumns, sketchRows, generator,"\
+    "hashFunction, startTime, timeHash, timeUpdate, timeDifference" >> $resultfile
+for i in {0..7}
+do
+    columns=${VCOLUMNS[$i]}
+    rows=${VROWS[$i]}
+    for generator in cw2 cw4 eh3 bch3 bch5
+    do
+        ./timing $pcap AGMS 32 $columns $rows $generator >> $resultfile
+        ./timing $pcap FAGMS 32 $columns $rows $generator >> $resultfile
+        ./timing $pcap FAGMS 32 $columns $rows $generator cw4 >> $resultfile
+    done
+    for generator in cw2 cw4 tab
+    do
+        ./timing $pcap FastCount 32 $columns $rows $generator >> $resultfile
+    done
+done
+EOF
 
+bash timing.sh

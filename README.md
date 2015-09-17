@@ -10,6 +10,7 @@ getips > ips.txt
 
 # Deploy the experiment on all the nodes
 # `run` will run the provided script on the remote nodes, it also accept direct commands like: run ls
+put ../src/timing.cpp
 run ../src/deploy
 ^C
 
@@ -19,7 +20,7 @@ run ../src/experiment
 
 # Collect the results once the experiment is finished
 # Results will be stored in env/results/date/
-collect
+get test.pcap
 ^C
 
 ```

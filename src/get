@@ -18,7 +18,7 @@ while read IP; do
         -o ControlMaster=auto \
         -o ControlPersist=yes \
         -o ControlPath=~/.ssh/confine-%r-%h-%p \
-        root@[$IP]:file.pcap $results_dir/$counter.pcap &> "$log_path" &
+        root@[$IP]:$1 $results_dir/$counter.pcap &> "$log_path" &
     counter=$(($counter+1))
     logs="$logs $log_path"
 done < <(cat "$ips_path")
