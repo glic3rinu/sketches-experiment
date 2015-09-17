@@ -10,6 +10,8 @@ git clone https://github.com/glic3rinu/sketches-experiment.git
 # env is the working directory
 cd sketches-experiment/env
 export PATH=$PATH:$(pwd)/../src
+
+# Collect all the slivers IP addresses
 getips > ips.txt
 
 # Deploy the experiment on all the nodes
