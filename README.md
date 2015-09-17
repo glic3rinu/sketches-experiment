@@ -12,6 +12,7 @@ cd sketches-experiment/env
 export PATH=$PATH:$(pwd)/../src
 
 # Collect all the slivers IP addresses
+export SLICE_ID=1514
 getips > ips.txt
 
 # Deploy the experiment on all the nodes

@@ -2,9 +2,9 @@
 
 import requests
 import json
+import os
 
-
-SLICE_ID=1514
+SLICE_ID=os.environ.get('SLICE_ID', 1514)
 
 
 slice_req = requests.get('https://controller.community-lab.net/api/slices/%i' % SLICE_ID)
