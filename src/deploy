@@ -1,0 +1,10 @@
+#!/bin/bash
+
+git clone https://github.com/esterl/sketches.git
+cd sketches
+make
+sudo make install
+
+
+g++ timing.cpp -lpcap -lssl -lcrypto -lsketches -I<PATH TO SKETCHES> -o timing -std=c++11
+
